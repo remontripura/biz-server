@@ -23,13 +23,10 @@ async function run() {
         const db = client.db("newsCollection");
         const allNews = db.collection("news");
 
-
-
-
         app.post('/news', async (req, res) => {
-            const { img, title, news } = req.body;
+            const { imageUrl, title, news } = req.body;
             const date = new Date().toDateString();
-            const query = { img, title, news, date: date }
+            const query = { imageUrl, title, news, date: date }
             const result = await allNews.insertOne(query);
             res.send(result)
         })
