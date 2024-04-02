@@ -24,11 +24,12 @@ async function run() {
         const allNews = db.collection("news");
 
         app.post('/news', async (req, res) => {
-            const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
+            // const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
+            const body = req.body;
             const date = new Date().toDateString();
-            const query = { imageUrl, title1, title2, title3, news1, news2, news3, date: date }
-            console.log(query);
-            const result = await allNews.insertOne(query);
+            // const query = { imageUrl, title1, title2, title3, news1, news2, news3, date: date }
+          
+            const result = await allNews.insertOne(body);
             res.send(result)
         })
 
