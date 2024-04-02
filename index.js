@@ -43,7 +43,7 @@ async function run() {
             const result = await allNews.findOne(query);
             res.send(result)
         })
- 
+
         app.put('/news/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
@@ -52,12 +52,14 @@ async function run() {
             const classes = {
                 $set: {
                     title1: updateClass.title1,
-                    blog: updateClass.blog1,
-                    price: updateClass.price,
-                    sheet: updateClass.sheet
+                    title2: updateClass.title2,
+                    title3: updateClass.title3,
+                    news1: updateClass.news1,
+                    news2: updateClass.news2,
+                    news3: updateClass.news3,
                 },
             };
-            const result = await classCollection.updateOne(filter, classes, options);
+            const result = await allNews.updateOne(filter, classes, options);
             res.send(result)
         })
 
