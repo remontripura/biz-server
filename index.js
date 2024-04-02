@@ -24,9 +24,10 @@ async function run() {
         const allNews = db.collection("news");
 
         app.post('/news', async (req, res) => {
-            const { imageUrl, title, news } = req.body;
+            const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
             const date = new Date().toDateString();
-            const query = { imageUrl, title, news, date: date }
+            const query = { imageUrl, title1, title2, title3, news1, news2, news3, date: date }
+            console.log(query);
             const result = await allNews.insertOne(query);
             res.send(result)
         })
@@ -40,6 +41,23 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await allNews.findOne(query);
+            res.send(result)
+        })
+ 
+        app.put('/news/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const updateClass = req.body;
+            const classes = {
+                $set: {
+                    title1: updateClass.title1,
+                    blog: updateClass.blog1,
+                    price: updateClass.price,
+                    sheet: updateClass.sheet
+                },
+            };
+            const result = await classCollection.updateOne(filter, classes, options);
             res.send(result)
         })
 
