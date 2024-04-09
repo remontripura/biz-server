@@ -22,14 +22,32 @@ async function run() {
     try {
         const db = client.db("newsCollection");
         const allNews = db.collection("news");
+        const allCategory = db.collection("category");
 
         app.post('/news', async (req, res) => {
             // const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
-            const body = req.body;
-            const date = new Date().toDateString();
-            // const query = { imageUrl, title1, title2, title3, news1, news2, news3, date: date }
-          
-            const result = await allNews.insertOne(body);
+            const { title, imageUrl, content, category } = req.body;
+            const monthNames = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ];
+            const today = new Date()
+            const date = today.getDate();
+            const month = today.getMonth();
+            const monthName = monthNames[month]
+            const year = today.getFullYear();
+            const query = { title, imageUrl, content, category, date: { date, monthName, year } }
+            const result = await allNews.insertOne(query);
             res.send(result)
         })
 
@@ -50,20 +68,44 @@ async function run() {
             const filter = { _id: new ObjectId(id) }
             const options = { upsert: true }
             const updateClass = req.body;
+            
+            console.log(updateClass);
             const classes = {
                 $set: {
-                    title1: updateClass.title1,
-                    title2: updateClass.title2,
-                    title3: updateClass.title3,
-                    news1: updateClass.news1,
-                    news2: updateClass.news2,
-                    news3: updateClass.news3,
+                    content: updateClass.content,
+                    title: updateClass.title,
+                    category: updateClass.category,
                 },
             };
             const result = await allNews.updateOne(filter, classes, options);
             res.send(result)
         })
 
+
+        // add Category
+        // app.post('/category', async (req, res) => {
+        //     const { categoryName } = req.body;
+        //     const query = { categoryName }
+        //     const result = await allCategory.insertOne(query)
+        //     res.send(result)
+        // })
+        app.post('/category', async (req, res) => {
+            try {
+                const { categoryName } = req.body;
+                const existing = await allCategory.findOne({ categoryName })
+                if (existing) {
+                    return res.status(400).json({ error: 'category already exist' })
+                }
+                const result = await allCategory.insertOne({ categoryName })
+                res.status(201).json(result)
+            } catch (error) {
+                res.status(500).json({ error })
+            }
+        })
+        app.get('/category', async (req, res) => {
+            const result = await allCategory.find().toArray();
+            res.send(result)
+        })
         await client.db("admin").command({ ping: 1 });
     } finally {
     }
