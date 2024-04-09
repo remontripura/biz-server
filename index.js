@@ -24,6 +24,11 @@ async function run() {
         const allNews = db.collection("news");
         const allCategory = db.collection("category");
 
+        app.get('/', async (req, res) => {
+            const result = 'api is runnig on 5000'
+            res.send(result)
+        })
+
         app.post('/news', async (req, res) => {
             // const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
             const { title, imageUrl, content, category } = req.body;
@@ -68,8 +73,6 @@ async function run() {
             const filter = { _id: new ObjectId(id) }
             const options = { upsert: true }
             const updateClass = req.body;
-
-            console.log(updateClass);
             const classes = {
                 $set: {
                     content: updateClass.content,
@@ -80,8 +83,6 @@ async function run() {
             const result = await allNews.updateOne(filter, classes, options);
             res.send(result)
         })
-
-
         // add Category
         // app.post('/category', async (req, res) => {
         //     const { categoryName } = req.body;
