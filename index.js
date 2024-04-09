@@ -68,7 +68,7 @@ async function run() {
             const filter = { _id: new ObjectId(id) }
             const options = { upsert: true }
             const updateClass = req.body;
-            
+
             console.log(updateClass);
             const classes = {
                 $set: {
@@ -89,6 +89,19 @@ async function run() {
         //     const result = await allCategory.insertOne(query)
         //     res.send(result)
         // })
+        app.get("/category-group", async (req, res) => {
+            const pipeline = [
+                {
+                    $group: {
+                        _id: "$category",
+                        category: { $first: "$category" },
+                        count: { $sum: 1 },
+                    },
+                },
+            ];
+            const result = await allNews.aggregate(pipeline).toArray();
+            res.send(result);
+        });
         app.post('/category', async (req, res) => {
             try {
                 const { categoryName } = req.body;
