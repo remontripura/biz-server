@@ -106,6 +106,36 @@ async function run() {
         //     const result = await allCategory.insertOne(query)
         //     res.send(result)
         // })
+
+        app.patch('/news/:id', async (req, res) => {
+            const userId = req.params.id;
+            const updatedUserData = req.body;
+            
+            // Validate userId
+            if (!ObjectId.isValid(userId)) {
+                return res.status(400).json({ error: 'Invalid userId' });
+            }
+        
+            try {
+                const filter = { _id: new ObjectId(userId) };
+                const updateDoc = { $set: updatedUserData };
+        
+                const result = await allNews.updateOne(filter, updateDoc);
+        
+                if (result.matchedCount === 0) {
+                    return res.status(404).json({ error: 'News not found' });
+                }
+        
+                // Get the updated news data
+                const updatedNews = await allNews.findOne(filter);
+                res.json({ message: 'News data updated successfully', updatedNews });
+            } catch (error) {
+                console.error('Error updating news:', error);
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        });
+
+        
         app.get("/category-group", async (req, res) => {
             const pipeline = [
                 {
