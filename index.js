@@ -31,7 +31,7 @@ async function run() {
 
         app.post('/news', async (req, res) => {
             // const { imageUrl, title1, title2, title3, news1, news2, news3 } = req.body;
-            const { title, imageUrl, content, category } = req.body;
+            const { title, imageUrl, content, category, deleteApi } = req.body;
             const monthNames = [
                 "January",
                 "February",
@@ -51,7 +51,7 @@ async function run() {
             const month = today.getMonth();
             const monthName = monthNames[month]
             const year = today.getFullYear();
-            const query = { title, imageUrl, content, category, date: { date, monthName, year } }
+            const query = { title, imageUrl, content, category, deleteApi, date: { date, monthName, year } }
             const result = await allNews.insertOne(query);
             res.send(result)
         })
@@ -75,6 +75,7 @@ async function run() {
             const updateClass = req.body;
             const classes = {
                 $set: {
+                    img: updateClass.imageUrl,
                     content: updateClass.content,
                     title: updateClass.title,
                     category: updateClass.category,
@@ -83,6 +84,21 @@ async function run() {
             const result = await allNews.updateOne(filter, classes, options);
             res.send(result)
         })
+        app.delete('/news/:id', async (req, res) => {
+            const itemId = req.params.id;
+            const result = await allNews.deleteOne({ _id: new ObjectId(itemId) });
+            res.send(result)
+            // try {
+            //     const result = await allNews.deleteOne({ _id: new ObjectId(itemId) });
+            //     if (result.deletedCount === 1) {
+            //         res.status(200).json({ message: 'Item deleted successfully' });
+            //     } else {
+            //         res.status(404).json({ message: 'Item not found' });
+            //     }
+            // } catch (error) {
+            //     res.status(500).json({ message: 'Internal server error' });
+            // }
+        });
         // add Category
         // app.post('/category', async (req, res) => {
         //     const { categoryName } = req.body;
