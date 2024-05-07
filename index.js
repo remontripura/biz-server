@@ -51,7 +51,8 @@ async function run() {
             const month = today.getMonth();
             const monthName = monthNames[month]
             const year = today.getFullYear();
-            const query = { title, imageUrl, content, category, deleteApi, date: { date, monthName, year } }
+       
+            const query = { title, imageUrl, content, category, deleteApi, date: { date, monthName, year }, time: today }
             const result = await allNews.insertOne(query);
             res.send(result)
         })
@@ -110,22 +111,22 @@ async function run() {
         app.patch('/news/:id', async (req, res) => {
             const userId = req.params.id;
             const updatedUserData = req.body;
-            
+
             // Validate userId
             if (!ObjectId.isValid(userId)) {
                 return res.status(400).json({ error: 'Invalid userId' });
             }
-        
+
             try {
                 const filter = { _id: new ObjectId(userId) };
                 const updateDoc = { $set: updatedUserData };
-        
+
                 const result = await allNews.updateOne(filter, updateDoc);
-        
+
                 if (result.matchedCount === 0) {
                     return res.status(404).json({ error: 'News not found' });
                 }
-        
+
                 // Get the updated news data
                 const updatedNews = await allNews.findOne(filter);
                 res.json({ message: 'News data updated successfully', updatedNews });
@@ -135,7 +136,7 @@ async function run() {
             }
         });
 
-        
+
         app.get("/category-group", async (req, res) => {
             const pipeline = [
                 {
@@ -149,6 +150,9 @@ async function run() {
             const result = await allNews.aggregate(pipeline).toArray();
             res.send(result);
         });
+
+
+
         app.post('/category', async (req, res) => {
             try {
                 const { categoryName } = req.body;
@@ -166,6 +170,13 @@ async function run() {
             const result = await allCategory.find().toArray();
             res.send(result)
         })
+        app.get('/category/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await allCategory.findOne(query);
+            res.send(result)
+        })
+
         await client.db("admin").command({ ping: 1 });
     } finally {
     }
@@ -175,10 +186,3 @@ run().catch(console.dir);
 app.listen(port, () => {
     console.log("api is runnig on ", port);
 })
-
-
-
-
-
-
-
